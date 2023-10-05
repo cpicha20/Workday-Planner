@@ -22,13 +22,52 @@ $(function () {
   // TODO: Add code to display the current date in the header of the page.
   makePlanner();
   colorchange();
+  currentDate();
+
+  $(".saveBtn").on("click", function () {
+    let blockIndex = $(this).parent().attr("id");
+    let message = $(this).prev().val();
+
+    let entry = {};
+
+    entry.index = blockIndex;
+    entry.note = message;
+
+    for (let i = 0; i < saveArray.length; i++) {
+      if (blockIndex === saveArray[i].index) {
+        saveArray.splice(i);
+      }
+    }
+    saveArray.push(entry);
+    console.log(saveArray);
+
+    if (localStorage.getItem("save") === null) {
+      var jsonString = JSON.stringify(saveArray);
+      localStorage.setItem("save", jsonString);
+    } else {
+      var storedData = localStorage.getItem("save");
+      var retrievedArray = JSON.parse(storedData);
+      retrievedArray.push(saveArray);
+      var jsonString = JSON.stringify(retrievedArray);
+      localStorage.setItem("save", jsonString);
+    }
+  });
 });
 
 let currentTime = dayjs().hour();
+let saveArray = [];
 
 function currentDate() {
-  currentDay =$("#currentDay");
-  currentDay
+  currentday = $("#currentDay");
+  currentday.text(dayjs().format(`dddd, MMMM D`));
+
+
+  setInterval(function() {
+  currentTime = dayjs().hour();
+  currentday.text(dayjs().format(`dddd, MMMM D`));
+  
+  },1000)
+
 
 }
 
@@ -41,6 +80,8 @@ function makePlanner() {
     buttonBlock.append($(`<i class="fas fa-save" aria-hidden="true"></i>`));
     timeBlock.append(buttonBlock);
     $(".planner").append(timeBlock);
+    loadSave();
+
   }
 }
 
@@ -51,7 +92,6 @@ function colorchange() {
     $(`#hour-${i}`).removeClass("present");
     $(`#hour-${i}`).removeClass("future");
 
-    console.log(currentTime);
     if (i < currentTime) {
       $(`#hour-${i}`).addClass("past");
     } else if (i == currentTime) {
@@ -71,3 +111,15 @@ function Am2PM(time) {
     return `${(time -= 12)}PM`;
   }
 }
+
+function loadSave() {
+  var storedData = localStorage.getItem("save");
+  var retrievedArray = JSON.parse(storedData);
+
+  if (retrievedArray != null)
+  {
+    for (let i = 0; i < retrievedArray.length; i++) {
+      $(`#hour-${i+9}`).children("textarea").text(retrievedArray[i].note);
+      }
+    }
+  }
