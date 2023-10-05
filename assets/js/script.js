@@ -24,6 +24,7 @@ $(function () {
   colorchange();
   currentDate();
 
+  //Save button that saves the textArea 
   $(".saveBtn").on("click", function () {
     let blockIndex = $(this).parent().attr("id");
     let message = $(this).prev().val();
@@ -32,37 +33,38 @@ $(function () {
 
     entry.index = blockIndex;
     entry.note = message;
-
-    saveArray = JSON.parse(localStorage.getItem("save"));
+  
+    let saveArray = JSON.parse(localStorage.getItem("save"));
     if (saveArray === null) {
-      saveArray=[];
+      saveArray = [];
     }
     for (let i = 0; i < saveArray.length; i++) {
-      console.log(saveArray);
       if (blockIndex === saveArray[i].index) {
-        saveArray.splice(i,1);
+        saveArray.splice(i, 1);
       }
     }
 
     saveArray.push(entry);
-      var jsonString = JSON.stringify(saveArray);
-      localStorage.setItem("save", jsonString);
+    var jsonString = JSON.stringify(saveArray);
+    localStorage.setItem("save", jsonString);
   });
 });
 
 let currentTime = dayjs().hour();
-let saveArray = [];
 
+//uses DayJS to find and render current date onscreen
 function currentDate() {
   currentday = $("#currentDay");
   currentday.text(dayjs().format(`dddd, MMMM D`));
 
   setInterval(function () {
+    colorchange();
     currentTime = dayjs().hour();
     currentday.text(dayjs().format(`dddd, MMMM D`));
-  }, 1000);
+  }, 60000);
 }
 
+//Spawn time block elements 
 function makePlanner() {
   for (let i = 9; i <= 17; i++) {
     timeBlock = $(`<div id="hour-${i}" class="row time-block past"> </div>`);
@@ -73,14 +75,23 @@ function makePlanner() {
     timeBlock.append(buttonBlock);
     $(".planner").append(timeBlock);
     loadSave();
-    
   }
   var storedData = localStorage.getItem("save");
   var retrievedArray = JSON.parse(storedData);
-
 }
 
-//
+//Prints out AM or PM times based on for loop i value
+function Am2PM(time) {
+  if (time < 12) {
+    return `${time}AM`;
+  } else if (time === 12) {
+    return `${time}PM`;
+  } else {
+    return `${(time -= 12)}PM`;
+  }
+}
+
+//Changes colors based on the time 
 function colorchange() {
   for (let i = 9; i <= 17; i++) {
     $(`#hour-${i}`).removeClass("past");
@@ -97,26 +108,14 @@ function colorchange() {
   }
 }
 
-function Am2PM(time) {
-  if (time < 12) {
-    return `${time}AM`;
-  } else if (time === 12) {
-    return `${time}PM`;
-  } else {
-    return `${(time -= 12)}PM`;
-  }
-}
 
+//loading localStorage  
 function loadSave() {
   var storedData = localStorage.getItem("save");
   var retrievedArray = JSON.parse(storedData);
   if (retrievedArray != null) {
     for (let i = 0; i < retrievedArray.length; i++) {
-      $(`#${retrievedArray[i].index}`)
-        .children("textarea")
-        .text(retrievedArray[i].note);
+      $(`#${retrievedArray[i].index}`).children("textarea").text(retrievedArray[i].note);
     }
   }
 }
-
-// localStorage.clear();
