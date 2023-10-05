@@ -29,21 +29,24 @@ $(function () {
     let blockIndex = $(this).parent().attr("id");
     let message = $(this).prev().val();
 
+    // create new object
     let entry = {};
 
     entry.index = blockIndex;
     entry.note = message;
-  
+//Load an array from localStorage  
     let saveArray = JSON.parse(localStorage.getItem("save"));
     if (saveArray === null) {
       saveArray = [];
     }
+    //loop through localStorage array and remove entries with the same ID
     for (let i = 0; i < saveArray.length; i++) {
       if (blockIndex === saveArray[i].index) {
         saveArray.splice(i, 1);
       }
     }
 
+    //add new message
     saveArray.push(entry);
     var jsonString = JSON.stringify(saveArray);
     localStorage.setItem("save", jsonString);
@@ -57,6 +60,8 @@ function currentDate() {
   currentday = $("#currentDay");
   currentday.text(dayjs().format(`dddd, MMMM D`));
 
+
+  //Update date/colors every minute
   setInterval(function () {
     colorchange();
     currentTime = dayjs().hour();
@@ -66,6 +71,7 @@ function currentDate() {
 
 //Spawn time block elements 
 function makePlanner() {
+  //loop through and spawn timeblocks
   for (let i = 9; i <= 17; i++) {
     timeBlock = $(`<div id="hour-${i}" class="row time-block past"> </div>`);
     timeBlock.append($(`<div class="col-2 col-md-1 hour text-center py-3"> ${Am2PM(i)} </div>`));
@@ -74,10 +80,10 @@ function makePlanner() {
     buttonBlock.append($(`<i class="fas fa-save" aria-hidden="true"></i>`));
     timeBlock.append(buttonBlock);
     $(".planner").append(timeBlock);
-    loadSave();
+ 
   }
-  var storedData = localStorage.getItem("save");
-  var retrievedArray = JSON.parse(storedData);
+  //Fills out text area with localStorage  
+loadSave();
 }
 
 //Prints out AM or PM times based on for loop i value
@@ -114,6 +120,7 @@ function loadSave() {
   var storedData = localStorage.getItem("save");
   var retrievedArray = JSON.parse(storedData);
   if (retrievedArray != null) {
+    //loop thorugh and fill out text area with the note property of the array retrieved from local storage
     for (let i = 0; i < retrievedArray.length; i++) {
       $(`#${retrievedArray[i].index}`).children("textarea").text(retrievedArray[i].note);
     }
