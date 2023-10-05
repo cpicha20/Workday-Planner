@@ -33,24 +33,23 @@ $(function () {
     entry.index = blockIndex;
     entry.note = message;
 
+    saveArray = JSON.parse(localStorage.getItem("save"));
+    if (saveArray === null) {
+      saveArray=[];
+    }
     for (let i = 0; i < saveArray.length; i++) {
+      console.log(saveArray);
       if (blockIndex === saveArray[i].index) {
         saveArray.splice(i);
+        saveArray.push(entry);
+      }else{
+        saveArray.push(entry);
       }
     }
-    saveArray.push(entry);
-    console.log(saveArray);
 
-    if (localStorage.getItem("save") === null) {
+    
       var jsonString = JSON.stringify(saveArray);
       localStorage.setItem("save", jsonString);
-    } else {
-      var storedData = localStorage.getItem("save");
-      var retrievedArray = JSON.parse(storedData);
-      retrievedArray.push(saveArray);
-      var jsonString = JSON.stringify(retrievedArray);
-      localStorage.setItem("save", jsonString);
-    }
   });
 });
 
@@ -61,14 +60,10 @@ function currentDate() {
   currentday = $("#currentDay");
   currentday.text(dayjs().format(`dddd, MMMM D`));
 
-
-  setInterval(function() {
-  currentTime = dayjs().hour();
-  currentday.text(dayjs().format(`dddd, MMMM D`));
-  
-  },1000)
-
-
+  setInterval(function () {
+    currentTime = dayjs().hour();
+    currentday.text(dayjs().format(`dddd, MMMM D`));
+  }, 1000);
 }
 
 function makePlanner() {
@@ -81,8 +76,11 @@ function makePlanner() {
     timeBlock.append(buttonBlock);
     $(".planner").append(timeBlock);
     loadSave();
-
+    
   }
+  var storedData = localStorage.getItem("save");
+  var retrievedArray = JSON.parse(storedData);
+
 }
 
 //
@@ -115,11 +113,13 @@ function Am2PM(time) {
 function loadSave() {
   var storedData = localStorage.getItem("save");
   var retrievedArray = JSON.parse(storedData);
-
-  if (retrievedArray != null)
-  {
+  if (retrievedArray != null) {
     for (let i = 0; i < retrievedArray.length; i++) {
-      $(`#hour-${i+9}`).children("textarea").text(retrievedArray[i].note);
-      }
+      $(`#${retrievedArray[i].index}`)
+        .children("textarea")
+        .text(retrievedArray[i].note);
     }
   }
+}
+
+// localStorage.clear();
