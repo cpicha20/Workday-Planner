@@ -40,14 +40,11 @@ $(function () {
     for (let i = 0; i < saveArray.length; i++) {
       console.log(saveArray);
       if (blockIndex === saveArray[i].index) {
-        saveArray.splice(i);
-        saveArray.push(entry);
-      }else{
-        saveArray.push(entry);
+        saveArray.splice(i,1);
       }
     }
 
-    
+    saveArray.push(entry);
       var jsonString = JSON.stringify(saveArray);
       localStorage.setItem("save", jsonString);
   });
